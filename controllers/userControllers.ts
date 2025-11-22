@@ -116,4 +116,29 @@ const getUserProfile = expressAsyncHandler(async(req:Request,res:Response) => {
     res.status(200).json(userWithNotes)
 })
 
-export {registerUser,loginUser,getCurrentUser, getUserProfile}
+// route => PUT /api/user/profile
+// desc => update user profile
+// access => private
+const updateUserProfile = expressAsyncHandler(async(req:Request,res:Response) => {
+    const userId = (req as any).user!.id;
+
+    const {name,email} = req.body;
+
+    if(!name || !email){
+        res.status(400)
+        throw new Error("All fields are mandatory")
+    }
+
+    const user = await prisma.user.update({
+        where:{id:userId},
+        data:{name,email}
+    })
+
+    res.status(200).json({
+        id:user.id,
+        name:user.name,
+        email:user.email
+    })
+})
+
+export {registerUser,loginUser,getCurrentUser, getUserProfile,updateUserProfile}
